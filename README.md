@@ -17,8 +17,6 @@ ODM stand for Object Document Model. It translates the documents in Mongo into u
 
 Rather than use the Mongo shell to create, read, update and delete documents, we'll use an npm package called `mongoose`. Mongoose will allow us to create schemas, do validations and make it easier to interact with Mongo inside an express app.
 
-![Mongoose Visual](Client_Server.png)
-
 ## Make a Schema
 
 A schema will allow us to set specific keys in our objects. So if we have a key of `name`, we won't be able to insert other keys that don't match like `firstName` or `names`. This helps keep our data more organized and reduces the chance of errors.

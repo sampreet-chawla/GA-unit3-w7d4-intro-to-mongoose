@@ -85,6 +85,7 @@ const db = mongoose.connection
 // Connect to Mongo
 mongoose.connect(mongoURI)
 ```
+- Try running your app `nodemon`
 
 Getting a warning like this?
 ![depreciation](https://i.imgur.com/47eb1oo.png)
@@ -96,7 +97,7 @@ This should clear up the errors:
 ```js
 mongoose.connect(
   mongoURI,
-  { useNewUrlParser: true, useUnifiedTopology: true },
+  { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false  },
   () => {
     console.log('the connection with mongod is established')
   }
@@ -373,6 +374,7 @@ Finally, we have a few options for updating
 
 If we want to have our updated document returned to us in the callback, we have to set an option of `{new: true}` as the third argument
 
+
 ```js
 Tweet.findOneAndUpdate(
   { title: 'Vespa' },
@@ -406,17 +408,23 @@ We can check out all the things we can do at the [Mongoose API docs](http://mong
 
 ### Advanced & New-ish!
 
-Mongoose 5.0.0 just came out on January 17, 2018
+Mongoose 5.0.0 came out on January 17, 2018
 [It has an updated query builder that chains much like jQuery](http://mongoosejs.com/docs/queries.html).
 
 Do a search, limit the number of returned queries to 2, sort them by title
 
 ```js
-Tweet.find({ likes: { $gte: 20 } }, 'title -_id')
-  .limit(2)
-  .sort('title')
-  .exec((err, tweets) => {
+const query = Tweet.find({ likes: { $gte: 20 } }, 'title -_id')
+    .limit(2)
+    .sort('title');
+
+
+query.exec((err, tweets) => {
     console.log(tweets)
     db.close()
-  })
+})
 ```
+
+In the above code, the query variable is of type Query. A Query enables you to build up a query using chaining syntax, rather than specifying a JSON object. The below 2 examples are equivalent.
+
+`.exec` will allow you to execute the query. You could use this to save a query in a variable and execute it at a later time.

@@ -56,7 +56,7 @@ In `student_examples`
 - `npm init -y` and go through the prompts
 - `npm i mongoose`
 - `touch tweet.js`
-- `atom .`
+- `code .`
 
 ## Set Up Mongoose
 

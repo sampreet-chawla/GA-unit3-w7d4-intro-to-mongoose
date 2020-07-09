@@ -349,9 +349,8 @@ We can also use advanced query options. Let's find the tweets that have 20 or mo
 
 We have two copies of our first tweet and a few options to delete it
 
-- `remove()` danger! Will remove all instances
-- `findOneAndRemove()` - this seems like a great choice
-- `.findByIdAndRemove()`- finds by ID - great for delete routes in an express app!
+- `deleteOne()` this seems like a great choice
+- `.findByIdAndDelete()`- finds by ID - great for delete routes in an express app!
 
 ```js
 Tweet.findOneAndRemove({ title: 'Deep Thoughts' }, (err, tweet) => {

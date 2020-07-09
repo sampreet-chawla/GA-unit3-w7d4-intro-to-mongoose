@@ -353,12 +353,8 @@ We have two copies of our first tweet and a few options to delete it
 - `.findByIdAndDelete()`- finds by ID - great for delete routes in an express app!
 
 ```js
-Tweet.deleteOne({ title: 'Deep Thoughts' }, (err, tweet) => {
-  if (err) {
-    console.log(err)
-  } else {
-    console.log('This is the deleted tweet:', tweet)
-  }
+Tweet.deleteOne({ title: 'Deep Thoughts' }, (err) => {
+  console.log(err)
   db.close()
 })
 ```

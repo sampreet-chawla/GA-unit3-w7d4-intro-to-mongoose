@@ -15,7 +15,24 @@
 
 ODM stand for Object Document Model. It translates the documents in Mongo into upgraded JavaScript Objects that have more helpful methods and properties when used in conjunction with express.
 
-Rather than use the Mongo shell to create, read, update and delete documents, we'll use an npm package called `mongoose`. Mongoose will allow us to create schemas, do validations and make it easier to interact with Mongo inside an express app.
+Rather than use the Mongo shell to create, read, update and delete documents, we'll use an npm package called `mongoose`. 
+
+<hr>
+
+#### <g-emoji class="g-emoji" alias="alarm_clock" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/23f0.png">⏰</g-emoji> Activity - 10min
+
+Let's review the [mongoose docs](https://mongoosejs.com/). 
+
+Without actually having worked with `mongoose` yet let's see if we can put your discovery tools to the test.  See if you can answer the following questions based on the documentation:
+
+- :question: What syntax  `connect` to the mongo database with a name of `tweets`?
+- :question: What is the overall syntax for writing a `Schema` a schema?
+- :question: What does `useNewUrlParser: true` do and why should we use it? 
+
+<hr>
+
+Mongoose will allow us to create schemas, do validations and make it easier to interact with Mongo inside an express app.
+
 
 ## Make a Schema
 
@@ -25,8 +42,7 @@ We can also specify the datatypes. We can set the datatype of `name` to a `strin
 
 We can also make some fields required and we can set default values as well.
 
-Here is a sample Schema, with many options. We'll be making a smaller variation of this
-
+Here is a sample Schema, with many options. 
 ```js
 const articleSchema = new Schema(
   {
@@ -37,7 +53,6 @@ const articleSchema = new Schema(
     publishDate: { type: Date, default: Date.now }, // can set defaults for properties
     hidden: Boolean,
     meta: {
-      // can have properties that are objects
       votes: Number,
       favs: Number
     }
@@ -48,121 +63,154 @@ const articleSchema = new Schema(
 
 ## Basic Set Up
 
-In `student_examples`
+In order to get coding `student_examples` should already be configured with the following:
 
-- `mkdir intro_to_mongoose`
-- `cd intro_to_mongoose`
-- `touch app.js`
-- `npm init -y` and go through the prompts
-- `npm i mongoose`
-- `touch tweet.js`
-- `code .`
+
+| File | Purpose|
+| ----------- | ------------- |
+| controllers/tweet.js         | business logic to connect to DB for full CRUD          |
+| db/connection.js       | sets up a connection to the db        |
+| db/seed.js       | some seed data to get us started       |
+| models/tweet.js      | schema structure for our data        |
+
+
+<img src="" />
 
 ## Set Up Mongoose
 
-Inside `app.js`
+Inside `db/connection.js` we need to do the following:
 
-- require mongoose
+- import `mongoose`
+- define the URI to the mongo database (in our case `tweet`)
+- open a connection to the `tweets` database
+- export `mongoose`
+
+
+Let's first import and export `mongoose`
 
 ```js
-// Dependencies
 const mongoose = require('mongoose')
-const Tweet = require('./tweet.js')
+
+// rest our code will go here
+
+module.exports = mongoose;
 ```
 
-- tell Mongoose where to connect with Mongo and have it connect with the sub-database `tweets` (if it doesn't exist, it will be created)
-- set `mongoose.connection` to a shorter variable name
+Now let's define the connection URI to the database we want to use.
+
 
 ```js
-// Global configuration
+const mongoose = require('mongoose')
+
 const mongoURI = 'mongodb://localhost:27017/' + 'tweets'
-const db = mongoose.connection
+
+module.exports = mongoose;
 ```
 
-- Connect to mongo
+Mongoose requires a few configuration parameters in order to work the way we need so let's add them.
 
 ```js
-// Connect to Mongo
-mongoose.connect(mongoURI)
-```
-- Try running your app `nodemon`
+const mongoose = require('mongoose')
 
-Getting a warning like this?
-![depreciation](https://i.imgur.com/47eb1oo.png)
+const mongoURI = 'mongodb://localhost:27017/' + 'tweets'
+const config = { useUnifiedTopology: true, useNewUrlParser: true };
 
-Warnings are ok, it'll still work, for now. But in later versions it may stop working and you'll have to update your code.
-
-This should clear up the errors:
-
-```js
-mongoose.connect(
-  mongoURI,
-  { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false  },
-  () => {
-    console.log('the connection with mongod is established')
-  }
-)
+module.exports = mongoose;
 ```
 
-- **OPTIONAL** provide error/success messages about the connections
+Almost there. Now we need to connect to mongo at the URI. 
+
 
 ```js
-// Connection Error/Success
-// Define callback functions for various events
+const mongoose = require('mongoose')
+
+const mongoURI = 'mongodb://localhost:27017/' + 'tweets'
+const config = { useUnifiedTopology: true, useNewUrlParser: true };
+mongoose.connect(mongoURI, config);
+
+module.exports = mongoose;
+```
+
+If we run the file in node we will see that it's connected.
+
+```sh
+node connection.js
+```
+
+<img src="https://i.imgur.com/ZYz3FUF.png">
+
+At this point our terminal has been hijacked by  `mongoose` and we would like to get it back by connecting to the `connection` and then `closing` it
+
+
+```js
+const mongoose = require('mongoose')
+
+const mongoURI = 'mongodb://localhost:27017/' + 'tweets'
+const config = { useUnifiedTopology: true, useNewUrlParser: true };
+mongoose.connect(mongoURI, config);
+
+const db = mongoose.connection;
+db.close()
+
+module.exports = mongoose;
+```
+
+
+
+We can even provide error/connected/success messages about the connections. 
+
+```js
+const mongoose = require('mongoose')
+
+const mongoURI = 'mongodb://localhost:27017/' + 'tweets'
+const config = { useUnifiedTopology: true, useNewUrlParser: true };
+mongoose.connect(mongoURI, config);
+
+const db = mongoose.connection;
+
 db.on('error', err => console.log(err.message + ' is mongod not running?'))
 db.on('connected', () => console.log('mongo connected: ', mongoURI))
 db.on('disconnected', () => console.log('mongo disconnected'))
+
+db.close()
+
+module.exports = mongoose;
 ```
 
-- While the connection is open, we won't have control of our terminal. If we want to regain control, we have to close the connection.
-  Let's set leave the connection open for 5 seconds to demonstrate that the app will hang and then we'll get our close message.
 
-Otherwise we have to press `control c`. When we run an express app, we typically want to leave the connection open, we don't need to get control of terminal back, we just let the app run.
+## The Tweet Schema
+
+In `models/tweet.js` we will need to import the connection to the db before we can create a schema.
 
 ```js
-// Automatically close after 5 seconds
-// for demonstration purposes to see that you must use `db.close()` in order to regain control of Terminal tab
-setTimeout(() => {
-  db.close()
-}, 5000)
+const mongoose = require('../db/connection');
 ```
 
-- The entire configuration for mongoose:
-- Don't memorize it, just set a bookmark and refer back to this as you need it.
-- note the setTimeout was just to demonstrate what `db.close()` does, you don't always need it
+Once the connection is established we can create a new instance of the `Schema`
+
 
 ```js
-// Dependencies
-const mongoose = require('mongoose')
-const Tweet = require('./tweet.js')
+const mongoose = require('../db/connection');
+const Schema = mongoose.Schema; 
 
-// Global Configuration
-const mongoURI = 'mongodb://localhost:27017/' + 'tweets'
-const db = mongoose.connection
-
-// Connect to Mongo
-mongoose.connect(mongoURI, { useNewUrlParser: true }, () => {
-  console.log('the connection with mongod is established')
-})
-
-// Connection Error/Success - optional but can be helpful
-// Define callback functions for various events
-db.on('error', err => console.log(err.message + ' is Mongod not running?'))
-db.on('connected', () => console.log('mongo connected: ', mongoURI))
-db.on('disconnected', () => console.log('mongo disconnected'))
+const tweetSchema = new Schema(
+  {
+    title: String,
+    body: String,
+    author: String,
+    likes: { type: Number, default: 0 },
+    sponsored: { type: Boolean, default: false }
+  },
+  { timestamps: true }
+)
 ```
 
-## Set Up Tweet Schema
-
-In `tweet.js`
+And with the `Schema` in place we can create a `model`
 
 ```js
-const mongoose = require('mongoose') // require mongoose
-const Schema = mongoose.Schema // create a shorthand for the mongoose Schema constructor
+const mongoose = require('../db/connection');
+const Schema = mongoose.Schema; 
 
-// create a new Schema
-// This will define the shape of the documents in the collection
-// https://mongoosejs.com/docs/guide.html
 const tweetSchema = new Schema(
   {
     title: String,
@@ -174,22 +222,38 @@ const tweetSchema = new Schema(
   { timestamps: true }
 )
 
-// Creating Tweet model : We need to convert our schema into a model-- will be stored in 'tweets' collection.  Mongo does this for you automatically
-// Model's are fancy constructors compiled from Schema definitions
-// An instance of a model is called a document.
-// Models are responsible for creating and reading documents from the underlying MongoDB Database
-// from here: https://mongoosejs.com/docs/models.html
 const Tweet = mongoose.model('Tweet', tweetSchema)
-
-//make this exportable to be accessed in `app.js`
 module.exports = Tweet
 ```
 
 ## Create a Document with Mongoose
 
-In `app.js`
+Since `controllers` are the gatekeepers to the data in the database we need to import the model there and use it to create a new `document`
 
-Let's make ourselves an object to insert into our database. When we connect with an express app, our data will be coming in as an object from the browser.
+First we need to import the connection.
+
+```js
+const mongoose = require('../db/connection');
+```
+
+Then the model
+
+```js
+const mongoose = require('../db/connection');
+const Tweet = require("../models/tweet");
+```
+
+And finally we will need to terminal the connection so we need to create a connection. 
+
+```js
+const mongoose = require('../db/connection');
+const Tweet = require("../models/tweet");
+const db = mongoose.connection;
+```
+
+### Our First DB Entry
+Before we import seed data let's create a single object that contains all the tweet info we need based on the `Scehma` we configured earlier. 
+
 
 ```js
 const myFirstTweet = {
@@ -199,33 +263,35 @@ const myFirstTweet = {
 }
 ```
 
+Using the `Tweet` model we can create the the `document` and then close the connection.
+
 ```js
 Tweet.create(myFirstTweet, (error, tweet) => {
   if (error) {
-    //if there is an error console log it
     console.log(error)
   } else {
-    // else show us the created tweet
     console.log(tweet)
   }
-  // get control of terminal back
-  // else just use control c
-  db.close()
+  db.close();
 })
 ```
 
-Let's run this with
-`node app.js`
+Run the controller and let's see it in action
+
+```js
+node controllers/tweet.js
+```
+
 
 We should see:
 
-![created via mongoose](https://i.imgur.com/I0EbPuu.png)
+<img src="https://i.imgur.com/qi4Y5zA.png" />
 
-Timestamps, deleted, and likes had default values, a unique \_id has been generated
+As we can see a unique `_id` has been assigned to the `document`.
 
-Every time we run `node app.js` it will run the code, and thus insert this object over and over again. Let's not do that. Let's comment it out.
+Every time we run `node controllers/tweet.js` it will run the code, and thus insert this object over and over again. Let's not do that. Let's comment it out.
 
-Let's insert many more tweets
+Let's insert many more tweets.  Inside of the `db` folder there is a file called `tweets.js` and includes the following list of tweets:
 
 ```js
 const manyTweets = [
@@ -246,45 +312,21 @@ const manyTweets = [
       'I shall deny friendship to anyone who does not exclusively shop at Whole Foods',
     author: 'Karolin',
     likes: 40
-  },
-  {
-    title: 'Organic',
-    body:
-      'Friends, I have spent $2300 to be one of the first people to own an organic smartphone',
-    author: 'Karolin',
-    likes: 162
-  },
-  {
-    title: 'Confusion',
-    body:
-      'Friends, why do you just respond with the word `dislike`? Surely you mean to click the like button?',
-    author: 'Karolin',
-    likes: -100
-  },
-  {
-    title: 'Vespa',
-    body:
-      'Friends, my Vespa has been upgraded to run on old french fry oil. Its top speed is now 11 mph',
-    author: 'Karolin',
-    likes: 2
-  },
-  {
-    title: 'Licensed',
-    body:
-      'Friends, I am now officially licensed to teach yogalates. Like this to get 10% off a private lesson',
-    author: 'Karolin',
-    likes: 3
-  },
-  {
-    title: 'Water',
-    body:
-      'Friends, I have been collecting rain water so I can indulge in locally sourced raw water. Ask me how',
-    author: 'Karolin'
   }
+  //...more tweet below
+
+
+  module.exports manyTweets
 ]
 ```
 
-Let's insert all these tweets:
+Let's first import the tweets
+
+```js
+const manyTweets = require('../db/tweets.js')
+```
+
+And then insert them all into the database:
 
 ```js
 Tweet.insertMany(manyTweets, (error, tweets) => {
@@ -297,9 +339,26 @@ Tweet.insertMany(manyTweets, (error, tweets) => {
 })
 ```
 
-- `node app.js`
+Here is the final code. 
 
-and let's comment it out so we don't insert duplicates
+```js
+const mongoose = require('../db/connection');
+const Tweet = require('../models/tweet.js');
+const db = mongoose.connection;
+
+const manyTweets = require('../db/seed.js');
+
+Tweet.insertMany(manyTweets, (error, tweets) => {
+	if (error) {
+		console.log(error);
+	} else {
+		console.log(tweets);
+	}
+	db.close();
+});
+```
+
+Run `node controllers/tweet.js` to see the tweet creation process.
 
 ## Find Documents with Mongoose
 
@@ -309,7 +368,9 @@ and let's comment it out so we don't insert duplicates
 - `findOne` - limits the search to the first document found
 - [`where`](http://mongoosejs.com/docs/queries.html) - allows you to build queries, we won't cover this today
 
-Let's find all
+ ### Find All
+
+Let's `find` all documents
 
 ```js
 Tweet.find((err, tweets) => {
@@ -318,7 +379,7 @@ Tweet.find((err, tweets) => {
 })
 ```
 
-Let's limit the fields returned, the second argument allows us to pass a string with the fields we are interested in:
+Let's limit the fields returned, the second argument allows us to pass a string with the fields we are interested in returning
 
 ```js
 Tweet.find({}, 'title body', (err, tweets) => {
@@ -326,7 +387,7 @@ Tweet.find({}, 'title body', (err, tweets) => {
   db.close()
 })
 ```
-
+### Find One
 Let's look for a specific tweet:
 
 ```js
@@ -336,24 +397,51 @@ Tweet.find({ title: 'Water' }, (err, tweet) => {
 })
 ```
 
-We can also use advanced query options. Let's find the tweets that have 20 or more likes
+### Advanced Queries
 
-```js
-// Tweet.find({ likes: { $gte: 20 } }, (err, tweets) => {
-//   console.log(tweets)
-//   db.close()
-// })
-```
+We can also use advanced query options. L
+
+
+<hr>
+
+#### <g-emoji class="g-emoji" alias="alarm_clock" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/23f0.png">⏰</g-emoji> Activity - 10min
+
+Let's review the [mongoose docs](https://mongoosejs.com/). 
+
+Now that you know a little more about creating `documents`, review the documents and if you can create a query for the following:
+
+- return tweets with 20 or more likes
+- return tweets with 20 or more likes where the `author` is `alex`
+
+<hr>
+
+<details><summary></summary>Solution</details>
+
+<!-- ```js
+Tweet.find({ likes: { $gte: 20 } }, (err, tweets) => {
+  console.log(tweets)
+  db.close()
+})
+``` -->
 
 ### Delete Documents with Mongoose
 
-We have two copies of our first tweet and a few options to delete it
+We have two copies of our first tweet and a few options to delete it. 
 
 - `deleteOne()` this seems like a great choice
 - `.findByIdAndDelete()`- finds by ID - great for delete routes in an express app!
 
 ```js
-Tweet.deleteOne({ title: 'Deep Thoughts' }, (err) => {
+Tweet.deleteOne({ title: 'Deep Thoughts' }, (err, deleted) => {
+  console.log(err)
+  db.close()
+})
+```
+
+Or...
+
+```js
+Tweet.findByIdAndDelete({ _id: id }, (err, deleted) => {
   console.log(err)
   db.close()
 })
@@ -367,8 +455,23 @@ Finally, we have a few options for updating
 - `findOneAndUpdate()`- Let's us find one and update it
 - `findByIdAndUpdate()` - Let's us find by ID and update - great for update/put routes in an express app!
 
-If we want to have our updated document returned to us in the callback, we have to set an option of `{new: true}` as the third argument
 
+```js
+Tweet.findOneAndUpdate(
+  { title: 'Vespa' },
+  { sponsored: true },
+  (err, tweet) => {
+    if (err) {
+      console.log(err)
+    } else {
+      console.log(tweet)
+    }
+    db.close()
+  }
+)
+```
+
+If we want to have our updated document returned to us in the callback, we have to set an option of `{new: true}` as the third argument
 
 ```js
 Tweet.findOneAndUpdate(
@@ -399,8 +502,6 @@ Tweet.countDocuments({ likes: { $gte: 20 } }, (err, tweetCount) => {
 })
 ```
 
-We can check out all the things we can do at the [Mongoose API docs](http://mongoosejs.com/docs/api.html)
-
 ### Advanced & New-ish!
 
 Mongoose 5.0.0 came out on January 17, 2018
@@ -423,3 +524,7 @@ query.exec((err, tweets) => {
 In the above code, the query variable is of type Query. A Query enables you to build up a query using chaining syntax, rather than specifying a JSON object. The below 2 examples are equivalent.
 
 `.exec` will allow you to execute the query. You could use this to save a query in a variable and execute it at a later time.
+
+### Resources
+
+- [Mongoose Docs](https://mongoosejs.com/)

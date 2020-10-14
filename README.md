@@ -89,10 +89,12 @@ Inside `db/connection.js` we need to do the following:
 Let's first import and export `mongoose`
 
 ```js
+// IMPORT MONGOOSE
 const mongoose = require('mongoose')
 
 // rest our code will go here
 
+// EXPORT MONGOOSE
 module.exports = mongoose;
 ```
 
@@ -100,21 +102,24 @@ Now let's define the connection URI to the database we want to use.
 
 
 ```js
+// IMPORT MONGOOSE
 const mongoose = require('mongoose')
-
+// CONNECTION URI
 const mongoURI = 'mongodb://localhost:27017/' + 'tweets'
-
+// EXPORT MONGOOSE
 module.exports = mongoose;
 ```
 
 Mongoose requires a few configuration parameters in order to work the way we need so let's add them.
 
 ```js
+// IMPORT MONGOOSE
 const mongoose = require('mongoose')
-
+// CONNECTION URI
 const mongoURI = 'mongodb://localhost:27017/' + 'tweets'
+// CONFIG PARAMS
 const config = { useUnifiedTopology: true, useNewUrlParser: true };
-
+// EXPORT MONGOOSE
 module.exports = mongoose;
 ```
 
@@ -122,12 +127,15 @@ Almost there. Now we need to connect to mongo at the URI.
 
 
 ```js
+// IMPORT MONGOOSE
 const mongoose = require('mongoose')
-
+// CONNECTION URI
 const mongoURI = 'mongodb://localhost:27017/' + 'tweets'
+// CONFIG PARAMS
 const config = { useUnifiedTopology: true, useNewUrlParser: true };
+// CONNECT TO URI
 mongoose.connect(mongoURI, config);
-
+// EXPORT MONGOOSE
 module.exports = mongoose;
 ```
 
@@ -150,6 +158,7 @@ const config = { useUnifiedTopology: true, useNewUrlParser: true };
 mongoose.connect(mongoURI, config);
 
 const db = mongoose.connection;
+// CLOSE THE BD
 db.close()
 
 module.exports = mongoose;
@@ -167,7 +176,7 @@ const config = { useUnifiedTopology: true, useNewUrlParser: true };
 mongoose.connect(mongoURI, config);
 
 const db = mongoose.connection;
-
+// ADDITIONAL MESSAGE CONNECTIONS
 db.on('error', err => console.log(err.message + ' is mongod not running?'))
 db.on('connected', () => console.log('mongo connected: ', mongoURI))
 db.on('disconnected', () => console.log('mongo disconnected'))
@@ -176,7 +185,6 @@ db.close()
 
 module.exports = mongoose;
 ```
-
 
 ## The Tweet Schema
 
@@ -360,6 +368,33 @@ Tweet.insertMany(manyTweets, (error, tweets) => {
 
 Run `node controllers/tweet.js` to see the tweet creation process.
 
+## Promises...Promises...Promises...
+
+It just so happens that mongoose returns a `Promise` which provides us the ability to refactor our code to use `.then()`. 
+
+Let's refactor the previous code to use `.then()`
+
+```js
+Tweet.insertMany(manyTweets)
+.then(tweets => {
+	console.log(tweets)
+	db.close();
+});
+```
+
+## A Clean Seed
+
+If you seed more than once then you will have duplicates in your db.  We can configure our initial `seeding` to delete all items before it creates them. 
+
+```js
+Tweet.deleteMany({}).then(() => {
+Tweet.insertMany(manyTweets).then(tweets => {
+    console.log(tweets)
+    db.close();
+  });
+});
+```
+
 ## Find Documents with Mongoose
 
 - Mongoose has 4 methods for this
@@ -414,8 +449,6 @@ Now that you know a little more about creating `documents`, review the documents
 - return tweets with 20 or more likes where the `author` is `alex`
 
 <hr>
-
-<details><summary></summary>Solution</details>
 
 <!-- ```js
 Tweet.find({ likes: { $gte: 20 } }, (err, tweets) => {

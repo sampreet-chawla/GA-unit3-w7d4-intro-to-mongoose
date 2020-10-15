@@ -16,6 +16,6 @@ db.on('error', (err) => console.log(err.message + ' is mongod not running?'));
 db.on('connected', () => console.log('mongo connected: ', mongoURI));
 db.on('disconnected', () => console.log('mongo disconnected'));
 // CLOSE THE CONNECTION
-db.close()
+// db.close()
 // EXPORT MONGOOSE
 module.exports = mongoose

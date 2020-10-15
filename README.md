@@ -23,7 +23,7 @@ Let's review the [mongoose docs](https://mongoosejs.com/).
 
 Without actually having worked with `mongoose` yet let's see if we can put your discovery tools to the test. See if you can answer the following questions based on the documentation:
 
-- :question: What syntax `connect` to the mongo database with a name of `tweets`?
+- :question: What syntax do we use to `connect` to the mongo database with a name of `tweets`?
 - :question: What is the overall syntax for writing a `Schema` a schema?
 - :question: What does `useNewUrlParser: true` do and why should we use it?
 

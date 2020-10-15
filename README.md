@@ -19,9 +19,9 @@ Rather than use the Mongo shell to create, read, update and delete documents, we
 
 #### <g-emoji class="g-emoji" alias="alarm_clock" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/23f0.png">⏰</g-emoji> Activity - 10min
 
-Let's review the [mongoose docs](https://mongoosejs.com/).
+Let's review the [mongoose docs](https://mongoosejs.com/).  The instructor will demo how easy it is to search the docs and find a working example on how to `find` an entry in the database. 
 
-Without actually having worked with `mongoose` yet let's see if we can put your discovery tools to the test. See if you can answer the following questions based on the documentation:
+**Your Turn**
 
 - :question: What syntax do we use to `connect` to the mongo database with a name of `tweets`?
 - :question: What is the overall syntax for writing a `Schema` a schema?

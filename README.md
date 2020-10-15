@@ -70,8 +70,6 @@ In order to get coding `student_examples` should already be configured with the 
 | db/seed.js           | some seed data to get us started              |
 | models/tweet.js      | schema structure for our data                 |
 
-<img src="" />
-
 ## Set Up Mongoose
 
 Inside `db/connection.js` we need to do the following:

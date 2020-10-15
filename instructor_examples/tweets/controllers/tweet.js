@@ -55,7 +55,7 @@ const indexSubsetFilter = () => {
 Tweet.find({ title: 'Organic' }, 'title body', (err, tweets) => {
 	console.log('tweets - find all', tweets);
 	db.close();
-});
+    });
 }
 // indexSubsetFilter()
 
@@ -64,7 +64,7 @@ const deleteOne = () => {
     Tweet.deleteOne({ title: 'Deep Thoughts' })
         .then((deleted) => console.log('deleted', deleted))
         .catch((err) => console.log(err))
-        .finally(() => { db.close()});
+        .finally(() => db.close());
 }
 // deleteOne()
 
@@ -73,7 +73,7 @@ const deleteOnById = () => {
     Tweet.findByIdAndDelete({ _id: '5f888580cc37ed017b7f0df' })
 			.then((deleted) => console.log('deleted', deleted))
 			.catch((error) => console.log(error))
-			.finally(() => {db.close()});
+			.finally(() => db.close());
 }
 // deleteOnById()
 
@@ -81,7 +81,7 @@ const deleteOnById = () => {
 const findOneAndUpdate = () => {
     Tweet.findOneAndUpdate(
         {title: 'Vespa'},
-        {sponsored: true },
+        {sponsored: false },
         { new: true })
         .then(updated => console.log('updated', updated))
         .catch(err => console.log('err', err))

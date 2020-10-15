@@ -5,7 +5,8 @@ const mongoURI = 'mongodb://localhost:27017/tweets'
 // CONFIG PARAMS
 const config = {
     useUnifiedTopology: true, 
-    useNewUrlParser: true 
+    useNewUrlParser: true,
+    useFindAndModify: false
 }
 // CONNECT TO THE DATABASE/URI
 mongoose.connect(mongoURI, config)

@@ -138,7 +138,7 @@ node connection.js
 
 <img src="https://i.imgur.com/ZYz3FUF.png">
 
-At this point our terminal has been hijacked by `mongoose` and we would like to get it back by connecting to the `connection` and then `closing` it
+At this point our terminal has been hijacked by `mongoose` and we would like to get it back by connecting to the `connection` and then `closing` it.
 
 ```js
 const mongoose = require('mongoose');
@@ -154,7 +154,7 @@ db.close();
 module.exports = mongoose;
 ```
 
-We can even provide error/connected/success messages about the connections.
+We can even provide `error/connected/success` messages about the connections.
 
 ```js
 const mongoose = require('mongoose');
@@ -176,8 +176,12 @@ module.exports = mongoose;
 
 ## The Tweet Schema
 
-In `models/tweet.js` we will need to import the connection to the db before we can create a schema.
+In `models/tweet.js` we will need to do the following:
 
+- import the connection 
+- create create a schema.
+
+Let's connect to the db. 
 ```js
 const mongoose = require('../db/connection');
 ```
@@ -200,7 +204,7 @@ const tweetSchema = new Schema(
 );
 ```
 
-And with the `Schema` in place we can create a `model`
+And with the `Schema` in place we can create a `model`.
 
 ```js
 const mongoose = require('../db/connection');
@@ -227,10 +231,10 @@ Although  `controllers` are the gatekeepers to the data in the database we first
 
 Here we will do the following:
 
-- import the connection to the mongo db we will be using
+- import the `connection `to the mongo db 
 - import the `Tweet` model 
-- create a connection to the db 
-- import the seedData.json file
+- create a `connection` to the db 
+- import the `seedData.json` file
 - create a new document for each element of seed data
 
 First we need to import the connection.
@@ -239,14 +243,14 @@ First we need to import the connection.
 const mongoose = require('../db/connection');
 ```
 
-Then the model
+Then import the model.
 
 ```js
 const mongoose = require('../db/connection');
 const Tweet = require('../models/tweet');
 ```
 
-And finally we will need to terminal the connection so we need to create a connection.
+And finally we will need to create a handle on the db connection in order to terminate the connection when we are done. 
 
 ```js
 const mongoose = require('../db/connection');
@@ -256,7 +260,7 @@ const db = mongoose.connection;
 
 ### Our First DB Entry
 
-Before we import seed data let's create a single object that contains all the tweet info we need based on the `Scehma` we configured earlier.
+Before we import seed data let's create a single object that contains all the tweet info we need based on the `Scehma` and `Model` we configured earlier.
 
 ```js
 const myFirstTweet = {
@@ -282,7 +286,7 @@ Tweet.create(myFirstTweet, (error, tweet) => {
 Run the `seed.js` file and let's see it in action
 
 ```js
-node db/seed.js
+node seed.js
 ```
 
 We should see:
@@ -291,8 +295,9 @@ We should see:
 
 As we can see a unique `_id` has been assigned to the `document`.
 
-Every time we run `node db/seed.js` it will run the code, and thus insert this object over and over again. Let's not do that. Let's comment it out.
+Every time we run `node seed.js` it will run the code, and thus insert this object over and over again. Let's not do that and comment it out.
 
+### Create Many Tweets
 Let's insert many more tweets. Inside of the `db` folder there is a file called `seedData.json` and includes the following list of tweets:
 
 ```js
@@ -318,13 +323,13 @@ Let's insert many more tweets. Inside of the `db` folder there is a file called 
 ]
 ```
 
-Let's first import the tweets
+Let's first import the tweets.
 
 ```js
 const manyTweets = require('./seedData.json');
 ```
 
-And then insert them all into the database:
+And then insert them all into the database using `insertMany`. 
 
 ```js
 Tweet.insertMany(manyTweets, (error, tweets) => {
@@ -356,7 +361,7 @@ Tweet.insertMany(manyTweets, (error, tweets) => {
 });
 ```
 
-Run `node db/seed.js` to see the tweet creation process.
+Run `node seed.js` to see the tweet creation process in action. 
 
 ## Promises...Promises...Promises...
 

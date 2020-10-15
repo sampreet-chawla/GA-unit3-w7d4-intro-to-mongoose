@@ -22,7 +22,7 @@ db.on('connected', () => console.log('mongo connected: ', mongoURI));
 db.on('disconnected', () => console.log('mongo disconnected'));
 
 // CLOSE THE CONNECTION
-db.close();
+//db.close();
 
 // EXPORT MONGOOSE
 module.exports = mongoose;

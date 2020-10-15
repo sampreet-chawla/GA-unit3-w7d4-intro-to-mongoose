@@ -72,9 +72,19 @@ const deleteOne = () => {
 const deleteOnById = () => {
     Tweet.findByIdAndDelete({ _id: '5f888580cc37ed017b7f0df' })
 			.then((deleted) => console.log('deleted', deleted))
-			.catch((err) => console.log(err))
-			.finally(() => {
-				db.close();
-			});
+			.catch((error) => console.log(error))
+			.finally(() => {db.close()});
 }
 // deleteOnById()
+
+// FIND ONE AND UPDATE
+const findOneAndUpdate = () => {
+    Tweet.findOneAndUpdate(
+        {title: 'Vespa'},
+        {sponsored: true },
+        { new: true })
+        .then(updated => console.log('updated', updated))
+        .catch(err => console.log('err', err))
+        .finally(() => db.close())
+}
+findOneAndUpdate()

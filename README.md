@@ -240,7 +240,7 @@ Here we will do the following:
 First we need to import the connection.
 
 ```js
-const mongoose = require('../db/connection');
+const mongoose = require('.connection');
 ```
 
 Then import the model.
